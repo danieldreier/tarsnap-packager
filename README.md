@@ -73,3 +73,5 @@ Notice: Finished catalog run in 7.17 seconds
 ntpd (pid  7518) is running...
 [root@webserver vagrant]#
 ```
+
+When you're done, you can do a "shutdown -h now" from inside the box, exit the shell and run a "vagrant halt", or run a "vagrant destroy" if you're really done with it.
