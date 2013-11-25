@@ -3,12 +3,12 @@ vagrant-example
 
 Simple Vagrant setup that installs Puppet on a Centos 6.4 system
 
-This sets up a dead-simple one-node puppet system. Here's how you use it:
+This sets up a dead-simple two-node puppet system - One CentOS 6.4, one Ubuntu 12.04. Here's how you use it:
 
 1. Install Vagrant
 2. Clone this repository
 3. cd vagrant-example
-4. vagrant up
+4. vagrant up centos_server
 5. (wait)
 
 Now you can play with it. Let's install ntp:
@@ -20,7 +20,7 @@ node default {
 }
 ```
 
-Now, log in to the running system, install the puppet ntp module, and run the puppet manifest:
+Let's do that by hand. Log in to the running system, install the puppet ntp module, and run the puppet manifest:
 
 ```bash
 $ vagrant ssh
