@@ -1,4 +1,4 @@
-# -*- mode: ruby -*-
+    # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
 # Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
@@ -34,11 +34,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
 
     config.vm.provision "shell", path: "tools/pre_setup.sh"
-
-    #vmconfig.vm.provision :puppet, :options => ["--pluginsync"], :module_path => "/vagrant/modules" do |puppet|
-    #  puppet.manifests_path = "manifests"
-    #  puppet.manifest_file = "site.pp"
-    #end
   end
 
   config.vm.define :ubuntu_12_server do |node|
