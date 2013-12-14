@@ -76,6 +76,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     node.vm.box_url = 'http://puppet-vagrant-boxes.puppetlabs.com/ubuntu-server-12042-x64-vbox4210-nocm.box'
     node.vm.hostname = 'ubuntu-12-webserver.boxnet'
 
+    config.vm.network :forwarded_port, guest: 80, host: 80
+    config.vm.network :forwarded_port, guest: 443, host: 443
+
     # Cache yum/apt update files using vagrant-cachier
     config.cache.auto_detect = true
 

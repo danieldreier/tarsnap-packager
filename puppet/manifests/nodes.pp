@@ -85,13 +85,32 @@ node 'ubuntu-12-webserver' inherits basenode {
   class { 'apache':
     default_mods        => false,
     default_confd_files => false,
+    mpm_module => 'prefork',
   }
+
+  include apache::mod::php
+  include apache::mod::rewrite
+  include apache::mod::deflate
+  include apache::mod::status
+  include apache::mod::ssl
 
   apache::vhost { 'example.com':
     port    => '80',
     docroot => '/var/www/example.com',
-    serveraliases    => ['www.example.com',],
+      serveraliases => [
+        'www.example.com',
+        'blog.example.com',
+        'ubuntu-12-webserver.boxnet',
+      ],
     require => Class['apache'],
     ssl => true,
+  }
+
+  file {'index.php':
+    path    => '/var/www/example.com/index.php',
+    ensure  => present,
+    mode    => 0644,
+    content => '<?php phpinfo(); ?>',
+    require => apache::vhost['example.com'],
   }
 }
