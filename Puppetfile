@@ -6,6 +6,11 @@ forge "http://forge.puppetlabs.com"
 # mod "puppetlabs/ntp", "0.0.3"
 mod "puppetlabs/ntp"
 mod "puppetlabs/stdlib"
+mod "example42/firewall"
+mod "example42/timezone"
+mod "puppetlabs/mysql"
+#mod "ghoneycutt/ssh"
+
 #
 #mod "apt",
 #   :git => "git://github.com/puppetlabs/puppetlabs-apt.git"

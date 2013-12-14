@@ -146,7 +146,7 @@ function run_librarian_puppet {
   ensure_package git
   ensure_package rubygems
 
-  cp -n /vagrant/Puppetfile* /etc/puppet/
+  rsync /vagrant/Puppetfile* /etc/puppet/
 
   if [ `gem query --local | grep librarian-puppet | wc -l` -eq 0 ]; then
     gem install librarian-puppet
