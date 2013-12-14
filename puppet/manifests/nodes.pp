@@ -1,29 +1,30 @@
 node basenode {
   class { 'timezone':
     timezone => 'US/Pacific',
-  } 
+  }
 
-#  class { "ssh":       
-#    sshd_config_use_dns => false,
-#    permit_root_login   => 'no',
-#    sshd_client_alive_interval  => '15',
-#  }
-
-  class { 'ntp': }
-
+  class { '::ntp':
+    # Using 4 sources for NTP to allow 3 sources during DNS failure on one of these providers
+    # 3 sources needed to sanity-check time by majority vote, in case of bad ntp server
+    servers  => [ '0.north-america.pool.ntp.org', '0.centos.pool.ntp.org', 'time.nist.gov', 'nist1-la.ustiming.org' ],
+    restrict => ['127.0.0.1'],
+    service_ensure => 'running',
+    service_enable => true,
+  }
+  
   $sysadmin_tools = [ 'man', 'screen', 'nc', 'mtr', 'iotop', 'openssh-clients', 'git' ]
   package { $sysadmin_tools: ensure => "installed" }
 
 }
 
 node 'centos-mariadb-server.boxnet' inherits basenode {
-yumrepo { "mariadb":
-  baseurl => "http://yum.mariadb.org/5.5/centos6-amd64",
-  descr => "MariaDB",
-  enabled => 1,
-  gpgcheck => 1,
-  gpgkey => "https://yum.mariadb.org/RPM-GPG-KEY-MariaDB",
-  sslverify => True,
+  yumrepo { "mariadb":
+    baseurl => "http://yum.mariadb.org/5.5/centos6-amd64",
+    descr => "MariaDB",
+    enabled => 1,
+    gpgcheck => 1,
+    gpgkey => "https://yum.mariadb.org/RPM-GPG-KEY-MariaDB",
+    sslverify => True,
   }
 
   class { '::mysql::client':
@@ -31,7 +32,6 @@ yumrepo { "mariadb":
     package_name => 'MariaDB-client',
     require => Yumrepo['mariadb'],
   }
-
 
   class { '::mysql::server':
     package_name => 'MariaDB-server',
