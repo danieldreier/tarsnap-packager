@@ -44,7 +44,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     # Cache yum update files using vagrant-cachier
     config.cache.auto_detect = true
 
-    #config.vm.network :forwarded_port, guest: 3306, host: 3306
     config.vm.network :private_network, ip: "192.168.33.12"
 
     config.vm.provider :virtualbox do |vb|
@@ -82,7 +81,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     # Cache yum/apt update files using vagrant-cachier
     config.cache.auto_detect = true
 
-    config.vm.network :private_network, ip: "192.168.33.11"
+    config.vm.network :private_network, ip: "192.168.33.13"
 
     config.vm.provider :virtualbox do |vb|
        vb.customize ["modifyvm", :id, "--memory", "512", "--cpus", "4", "--ioapic", "on"]
