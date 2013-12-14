@@ -8,6 +8,7 @@ mod "puppetlabs/ntp"
 mod "puppetlabs/stdlib"
 mod "example42/firewall"
 mod "example42/timezone"
+#mod "example42/yum"
 mod "puppetlabs/mysql"
 #mod "ghoneycutt/ssh"
 

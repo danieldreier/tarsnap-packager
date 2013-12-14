@@ -17,8 +17,29 @@ node basenode {
 }
 
 node 'centos-mariadb-server.boxnet' inherits basenode {
+yumrepo { "mariadb":
+  baseurl => "http://yum.mariadb.org/5.5/centos6-amd64",
+  descr => "MariaDB",
+  enabled => 1,
+  gpgcheck => 1,
+  gpgkey => "https://yum.mariadb.org/RPM-GPG-KEY-MariaDB",
+  sslverify => True,
+  }
+
+  class { '::mysql::client':
+    package_ensure => 'installed',
+    package_name => 'MariaDB-client',
+    require => Yumrepo['mariadb'],
+  }
+
+
   class { '::mysql::server':
+    package_name => 'MariaDB-server',
+    require => Class['::mysql::client'],
     root_password    => 'a09f32lja09d9-X',
+    #service_enabled => True,
+    restart => True,
+    service_name => 'mysql',
     override_options => { 'mysqld' => 
       { 
       'max_connections'                 => '1024',
