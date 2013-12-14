@@ -12,12 +12,11 @@ node basenode {
     service_enable => true,
   }
 
+  # Install the basic sysadmin tools we often need
   case $operatingsystem {
     'RedHat', 'CentOS': { $sysadmin_tools = [ 'man', 'screen', 'nc', 'mtr', 'iotop', 'openssh-clients', 'git' ]  }
     /^(Debian|Ubuntu)$/:{ $sysadmin_tools = [ 'man', 'screen', 'netcat6', 'mtr', 'iotop', 'openssh-client', 'git' ] }
-    default:            { $sysadmin_tools = [ 'man', 'screen', 'git' ]  }
   }
-  
   package { $sysadmin_tools: ensure => "installed" }
 
 }
@@ -42,7 +41,6 @@ node 'centos-mariadb-server.boxnet' inherits basenode {
     package_name => 'MariaDB-server',
     require => Class['::mysql::client'],
     root_password    => 'a09f32lja09d9-X',
-    #service_enabled => True,
     restart => True,
     service_name => 'mysql',
     override_options => { 'mysqld' => 
@@ -78,7 +76,7 @@ node 'centos-mariadb-server.boxnet' inherits basenode {
 }
 
 node 'ubuntu-12-server' inherits basenode {
-  
+  # Nothing here yet. This node exists as a template.
 }
 
 node 'ubuntu-12-webserver' inherits basenode {
