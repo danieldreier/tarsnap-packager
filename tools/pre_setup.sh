@@ -6,9 +6,9 @@ function ensure_package {
 
   # Check if the package is installed, and install it if not present
   if hash yum 2>/dev/null; then
-    rpm -qi "$package" > /dev/null || yum -y install "$package"
+    rpm -qi "$package" > /dev/null 2>&1 || yum -y install "$package"
   elif hash apt-get 2>/dev/null; then
-    if ! dpkg-query --status "$package" >/dev/null ; then 
+    if ! dpkg-query --status "$package" >/dev/null 2>&1; then 
       apt-get update
       apt-get install -y "$package"
     fi
@@ -19,7 +19,7 @@ function ensure_package {
 
 function ensure_puppet_gpg_key {
   # Check if it's installed already (only on CentOS/RedHat)
-  if hash rpm 2>/dev/null; then
+  if hash rpm 2>/dev/null /dev/null 2>&1; then
     rpm -qi gpg-pubkey-4bd6ec30-4ff1e4fa >/dev/null && return
   else
     echo "INFO: Cannot pre-install gpg key on non-rpm systems."
@@ -102,7 +102,7 @@ function ensure_puppet_repo {
   case $DistroBasedOn in
     redhat)
       # Check if it's installed already
-      rpm -qi puppetlabs-release > /dev/null && return
+      rpm -qi puppetlabs-release > /dev/null 2>&1 && return
       case $REV in
         5.*)
           rpm -ivh http://yum.puppetlabs.com/el/5/products/${MACH}/puppetlabs-release-5-7.noarch.rpm
@@ -117,7 +117,7 @@ function ensure_puppet_repo {
       ;;
     debian)
       echo "detected debian based distro"
-      if ! dpkg-query --status "puppetlabs-release" >/dev/null ; then
+      if ! dpkg-query --status "puppetlabs-release" >/dev/null 2>&1 ; then
         echo "installing http://apt.puppetlabs.com/puppetlabs-release-${PSUEDONAME}.deb"
         REPO_URL="http://apt.puppetlabs.com/puppetlabs-release-${PSUEDONAME}.deb"
         wget --output-document=${repo_path} ${REPO_URL} #2>/dev/null
@@ -149,7 +149,7 @@ function run_librarian_puppet {
   rsync /vagrant/Puppetfile* /etc/puppet/
 
   if [ `gem query --local | grep librarian-puppet | wc -l` -eq 0 ]; then
-    gem install librarian-puppet
+    gem install --no-ri --no-rdoc librarian-puppet
     cd $PUPPET_DIR && librarian-puppet install --clean
   else
     cd $PUPPET_DIR && librarian-puppet update

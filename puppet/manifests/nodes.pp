@@ -11,8 +11,13 @@ node basenode {
     service_ensure => 'running',
     service_enable => true,
   }
+
+  case $operatingsystem {
+    'RedHat', 'CentOS': { $sysadmin_tools = [ 'man', 'screen', 'nc', 'mtr', 'iotop', 'openssh-clients', 'git' ]  }
+    /^(Debian|Ubuntu)$/:{ $sysadmin_tools = [ 'man', 'screen', 'netcat6', 'mtr', 'iotop', 'openssh-client', 'git' ] }
+    default:            { $sysadmin_tools = [ 'man', 'screen', 'git' ]  }
+  }
   
-  $sysadmin_tools = [ 'man', 'screen', 'nc', 'mtr', 'iotop', 'openssh-clients', 'git' ]
   package { $sysadmin_tools: ensure => "installed" }
 
 }
@@ -70,5 +75,8 @@ node 'centos-mariadb-server.boxnet' inherits basenode {
   class { '::mysql::server::account_security': 
     require => Class['::mysql::server'],
   }
+}
 
+node 'ubuntu-12-server' inherits basenode {
+  
 }
