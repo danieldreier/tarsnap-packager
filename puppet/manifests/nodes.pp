@@ -111,4 +111,24 @@ node 'ubuntu-12-webserver' inherits basenode {
     content => '<?php phpinfo(); ?>',
     require => apache::vhost['example.com'],
   }
+
+  class { 'php': }
+
+  # CentOS and Ubuntu ship with different default PHP modules
+  # Added distro switch to make this more portable
+  case $operatingsystem {
+    'RedHat', 'CentOS': {
+      php::module { "pdo": }
+      php::module { "gd": }
+      php::module { "mbstring": }
+      php::module { "mysql": }
+      php::module { "xml": }
+       }
+    /^(Debian|Ubuntu)$/:{ 
+      php::module { "mysql": }
+      php::module { "mysqlnd": }
+      php::module { "gd": }
+    }
+  }
+
 }
