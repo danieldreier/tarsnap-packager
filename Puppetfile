@@ -7,3 +7,5 @@ mod "puppetlabs/stdlib"
 mod "example42/firewall"
 mod "example42/timezone"
 mod "puppetlabs/mysql"
+
+mod "puppetlabs/apache"

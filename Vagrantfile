@@ -70,5 +70,22 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
     config.vm.provision "shell", path: "tools/pre_setup.sh"
   end
+
+  config.vm.define :ubuntu_12_webserver do |node|
+    node.vm.box = "ubuntu-server-12042-x64-vbox4210-nocm"
+    node.vm.box_url = 'http://puppet-vagrant-boxes.puppetlabs.com/ubuntu-server-12042-x64-vbox4210-nocm.box'
+    node.vm.hostname = 'ubuntu-12-webserver.boxnet'
+
+    # Cache yum/apt update files using vagrant-cachier
+    config.cache.auto_detect = true
+
+    config.vm.network :private_network, ip: "192.168.33.11"
+
+    config.vm.provider :virtualbox do |vb|
+       vb.customize ["modifyvm", :id, "--memory", "512", "--cpus", "4", "--ioapic", "on"]
+    end
+
+    config.vm.provision "shell", path: "tools/pre_setup.sh"
+  end
   
 end

@@ -80,3 +80,18 @@ node 'centos-mariadb-server.boxnet' inherits basenode {
 node 'ubuntu-12-server' inherits basenode {
   
 }
+
+node 'ubuntu-12-webserver' inherits basenode {
+  class { 'apache':
+    default_mods        => false,
+    default_confd_files => false,
+  }
+
+  apache::vhost { 'example.com':
+    port    => '80',
+    docroot => '/var/www/example.com',
+    serveraliases    => ['www.example.com',],
+    require => Class['apache'],
+    ssl => true,
+  }
+}
