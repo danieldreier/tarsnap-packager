@@ -7,7 +7,7 @@ function ensure_package {
   # Check if the package is installed, and install it if not present
   if hash yum 2>/dev/null; then
     rpm -qi "$package" > /dev/null 2>&1 || yum -y install "$package"
-  elif hash apt-get 2>/dev/null; then
+  elif hash apt-get > /dev/null 2>&1; then
     if ! dpkg-query --status "$package" >/dev/null 2>&1; then 
       apt-get update
       apt-get install -y "$package"
@@ -19,21 +19,19 @@ function ensure_package {
 
 function ensure_puppet_gpg_key {
   # Check if it's installed already (only on CentOS/RedHat)
-  if hash rpm 2>/dev/null /dev/null 2>&1; then
+  if hash rpm > /dev/null 2>&1 ; then
     rpm -qi gpg-pubkey-4bd6ec30-4ff1e4fa >/dev/null && return
-  else
-    echo "INFO: Cannot pre-install gpg key on non-rpm systems."
-    return
+    KEYFILE="$(mktemp)"
+   
+    ensure_package wget
+    wget -O "$KEYFILE" http://yum.puppetlabs.com/RPM-GPG-KEY-puppetlabs
+
+    if [ "(sha256sum $KEYFILE)" == '02c7855fd9771c1e105b762ca4f9540cb8b37921f3ba0cc347a3d696229a3340' ]; then
+      rpm --import "$KEYFILE"
+    fi
   fi
 
-  KEYFILE="$(mktemp)"
- 
-  ensure_package wget
-  wget -O "$KEYFILE" http://yum.puppetlabs.com/RPM-GPG-KEY-puppetlabs
 
-  if [ "(sha256sum $KEYFILE)" == '02c7855fd9771c1e105b762ca4f9540cb8b37921f3ba0cc347a3d696229a3340'; then
-    rpm --import "$KEYFILE"
-  fi
 }
 
 lowercase(){
