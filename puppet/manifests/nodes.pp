@@ -109,7 +109,7 @@ node 'ubuntu-12-webserver' inherits basenode {
     ensure  => present,
     mode    => 0644,
     content => '<?php phpinfo(); ?>',
-    require => apache::vhost['example.com'],
+    require => Apache::Vhost['example.com'],
   }
 
   class { 'php': }
