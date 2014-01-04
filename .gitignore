@@ -1,3 +1,4 @@
 .vagrant/*
 puppet/modules/*
 puppet/.tmp/*
+packages/*.rpm
