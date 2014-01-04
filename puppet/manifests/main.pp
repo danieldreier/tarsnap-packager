@@ -1,7 +1,3 @@
-stage { 'first': }
-stage { 'last': }
-Stage['first'] -> Stage['main'] -> Stage['last']
-
 # script to run puppet
 file{"/usr/local/bin/runpuppet":
   content => " \
