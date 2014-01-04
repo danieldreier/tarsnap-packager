@@ -8,8 +8,9 @@ This sets up a dead-simple two-node puppet system - One CentOS 6.4, one Ubuntu 1
 1. Install Vagrant
 2. Clone this repository
 3. cd vagrant-example
-4. vagrant up centos_server
-5. (wait)
+4. vagrant plugin install vagrant-cachier
+5. vagrant up centos_server
+6. (wait)
 
 Now you can play with it. Let's install ntp:
 
