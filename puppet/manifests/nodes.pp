@@ -21,6 +21,12 @@ node basenode {
 
 }
 
+node 'centos-server.boxnet' inherits basenode {
+  # Placeholder
+
+}
+
+
 node 'centos-mariadb-server.boxnet' inherits basenode {
   yumrepo { "mariadb":
     baseurl => "http://yum.mariadb.org/5.5/centos6-amd64",
