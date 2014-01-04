@@ -5,7 +5,8 @@
 VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  
+    config.vm.provision "shell", path: "tools/install_puppet.sh"
+    config.vm.provision "shell", path: "tools/pre_setup.sh"
 
   config.vm.define :centos_server do |node|
     #node.box_url = 'http://puppet-vagrant-boxes.puppetlabs.com/centos-64-x64-vbox4210-nocm.box'
@@ -33,7 +34,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
        vb.customize ["modifyvm", :id, "--memory", "512", "--cpus", "4", "--ioapic", "on"]
     end
 
-    config.vm.provision "shell", path: "tools/pre_setup.sh"
   end
 
   config.vm.define :centos_mariadb_server do |node|
@@ -50,7 +50,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
        vb.customize ["modifyvm", :id, "--memory", "512", "--cpus", "4", "--ioapic", "on"]
     end
 
-    config.vm.provision "shell", path: "tools/pre_setup.sh"
   end
 
   config.vm.define :ubuntu_12_server do |node|
@@ -67,7 +66,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
        vb.customize ["modifyvm", :id, "--memory", "512", "--cpus", "4", "--ioapic", "on"]
     end
 
-    config.vm.provision "shell", path: "tools/pre_setup.sh"
   end
 
   config.vm.define :ubuntu_12_webserver do |node|
@@ -87,7 +85,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
        vb.customize ["modifyvm", :id, "--memory", "512", "--cpus", "4", "--ioapic", "on"]
     end
 
-    config.vm.provision "shell", path: "tools/pre_setup.sh"
   end
   
 end

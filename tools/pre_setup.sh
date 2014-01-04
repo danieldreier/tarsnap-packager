@@ -17,23 +17,6 @@ function ensure_package {
   fi
 }
 
-function ensure_puppet_gpg_key {
-  # Check if it's installed already (only on CentOS/RedHat)
-  if hash rpm > /dev/null 2>&1 ; then
-    rpm -qi gpg-pubkey-4bd6ec30-4ff1e4fa >/dev/null && return
-    KEYFILE="$(mktemp)"
-   
-    ensure_package wget
-    wget -O "$KEYFILE" http://yum.puppetlabs.com/RPM-GPG-KEY-puppetlabs
-
-    if [ "(sha256sum $KEYFILE)" == '02c7855fd9771c1e105b762ca4f9540cb8b37921f3ba0cc347a3d696229a3340' ]; then
-      rpm --import "$KEYFILE"
-    fi
-  fi
-
-
-}
-
 lowercase(){
     echo "$1" | sed "y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/"
 }
@@ -93,44 +76,6 @@ function detect_os {
   fi
 }
 
-function ensure_puppet_repo {
-  repo_path=$(mktemp)
-
-  detect_os
-  case $DistroBasedOn in
-    redhat)
-      # Check if it's installed already
-      rpm -qi puppetlabs-release > /dev/null 2>&1 && return
-      case $REV in
-        5.*)
-          rpm -ivh http://yum.puppetlabs.com/el/5/products/${MACH}/puppetlabs-release-5-7.noarch.rpm
-          ;;
-        6.*)
-          rpm -ivh http://yum.puppetlabs.com/el/6/products/${MACH}/puppetlabs-release-6-7.noarch.rpm
-          ;;
-        *)
-          echo "Unsupported distro detected"
-          exit 1
-      esac
-      ;;
-    debian)
-      echo "detected debian based distro"
-      if ! dpkg-query --status "puppetlabs-release" >/dev/null 2>&1 ; then
-        echo "installing http://apt.puppetlabs.com/puppetlabs-release-${PSUEDONAME}.deb"
-        REPO_URL="http://apt.puppetlabs.com/puppetlabs-release-${PSUEDONAME}.deb"
-        wget --output-document=${repo_path} ${REPO_URL} #2>/dev/null
-        dpkg -i ${repo_path}
-        apt-get update
-      fi
-      ;;
-    *)
-      echo "Unsupported OS - cannot install puppet repo"
-      return 1
-      ;;
-  esac
-  rm ${repo_path}
-}
-
 function run_librarian_puppet {
   # This installs puppet modules listed in Puppetfile
   # borrowed from https://github.com/mindreframer/vagrant-puppet-librarian
@@ -144,6 +89,14 @@ function run_librarian_puppet {
   ensure_package git
   ensure_package rubygems
 
+  if diff /vagrant/Puppetfile /etc/puppet/Puppetfile >/dev/null ; then
+    echo "Puppetfiles unchanged; no need to run librarian-puppet"
+    return
+  else
+    echo "Puppetfiles changed; running librarian-puppet to install puppet modules defined in Puppetfile."
+    echo "This make take several minutes..."
+  fi
+
   rsync /vagrant/Puppetfile* /etc/puppet/
 
   if [ `gem query --local | grep librarian-puppet | wc -l` -eq 0 ]; then
@@ -155,13 +108,6 @@ function run_librarian_puppet {
 
 }
 
-# Install pre-requisites
-ensure_package wget
-
-# Install puppet
-ensure_puppet_gpg_key
-ensure_puppet_repo
-ensure_package puppet
 cp /vagrant/files/puppet.conf /etc/puppet/puppet.conf
 
 run_librarian_puppet
