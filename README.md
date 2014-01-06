@@ -1,78 +1,28 @@
-vagrant-example
-===============
+Package tarsnap into RPMs
+-------------------------
 
-Simple Vagrant setup that installs Puppet on a Centos 6.4 system
+This is a very basic approach to packaging tarsnap into RPMs. I love tarsnap, but don't love installing anything that's not packaged on my production systems.
 
-This sets up a dead-simple two-node puppet system - One CentOS 6.4, one Ubuntu 12.04. Here's how you use it:
+To generate RPMs:
 
-1. Install Vagrant
-2. Clone this repository
-3. cd vagrant-example
-4. vagrant plugin install vagrant-cachier
-5. vagrant up centos_server
-6. (wait)
+1. install [vagrant](http://docs.vagrantup.com/v2/getting-started/index.html) and [virtualbox](https://www.virtualbox.org/)
+2. run `vagrant up` (or `vagrant up centos5` or `vagrant up centos6` if you only need one)
+3. get some coffee, this'll take a few minutes
+4. check the "packages" folder for packages
+5. `vagrant ssh centos6` to ssh into the centos6 (or 5) box to verify for yourself that the package is installed and works
+6. `vagrant destroy` to get rid of the virtualbox machines
 
-Now you can play with it. Let's install ntp:
+What's missing
+--------------
+1. Packages are not GPG signed. I can't redistribute the RPMs because of copyright restrictions on the software, so until the author either allows me to do that or hosts his own signed binaries in a yum repository that won't happen.
+2. Code is not GPG verified after download, before compile and packaging. Just haven't gotten to it yet.
+3. Testing is very basic. The build script installs the RPMs but doesn't do real testing to ensure functionality.
+4. There are no dependencies built into the RPMs (yet)
+5. There's no yum repository, so automatic updates aren't possible
+6. If a new version is released, you'll need to update the `VERSION` variable in tarsnap-build/tarsnap-rpm-builder.sh
+7. Packages are created using [FPM](https://github.com/jordansissel/fpm) so they're definitely not compliant with distro packaging guidelines. They work, but it's pretty basic.
 
-Edit puppet/manifests/nodes.pp so it reads like this:
-```
-node default {
-  class { 'ntp': }
-}
-```
+Future plans
+------------
 
-Let's do that by hand. Log in to the running system, install the puppet ntp module, and run the puppet manifest:
-
-```bash
-$ vagrant ssh
-Last login: Sun Apr 14 22:24:07 2013
-Welcome to your Vagrant-built virtual machine.
-[vagrant@webserver ~]$ sudo -s
-[root@webserver vagrant]# service ntpd status
-ntpd is stopped
-[root@webserver vagrant]# puppet module list
-/etc/puppet/modules (no modules installed)
-/usr/share/puppet/modules (no modules installed)
-[root@webserver vagrant]# puppet module install puppetlabs/ntp
-Notice: Preparing to install into /etc/puppet/modules ...
-Notice: Downloading from https://forge.puppetlabs.com ...
-Notice: Installing -- do not interrupt ...
-/etc/puppet/modules
-└─┬ puppetlabs-ntp (v2.0.1)
-  └── puppetlabs-stdlib (v4.1.0)
-[root@webserver vagrant]# puppet apply /vagrant/puppet/manifests/main.pp
-Warning: Config file /etc/puppet/hiera.yaml not found, using Hiera defaults
-Notice: Compiled catalog for webserver.boxnet in environment production in 0.60 seconds
-Notice: /Stage[main]//File[/usr/local/bin/runpuppet]/ensure: defined content as '{md5}796230865256e4deac14c66312233c81'
-Notice: /Stage[main]/Ntp::Config/File[/etc/ntp.conf]/content: content changed '{md5}23775267ed60eb3b50806d7aeaa2a0f1' to '{md5}4b263233a4890fad5349d9e314e65f18'
-Notice: /Stage[main]/Ntp::Service/Service[ntp]/ensure: ensure changed 'stopped' to 'running'
-Notice: Finished catalog run in 0.31 seconds
-[root@webserver vagrant]# service ntpd status
-ntpd (pid  7128) is running...
-```
-
-Puppethelps makes the system resist changes. Try this:
-
-```bash
-[root@webserver vagrant]# yum -y remove ntp
-Loaded plugins: fastestmirror, security
-[snipped for brevity]
-Removed:
-  ntp.x86_64 0:4.2.4p8-3.el6.centos
-
-Complete!
-[root@webserver vagrant]# service ntpd status
-ntpd: unrecognized service
-[root@webserver vagrant]# puppet apply /vagrant/puppet/manifests/main.pp
-Warning: Config file /etc/puppet/hiera.yaml not found, using Hiera defaults
-Notice: Compiled catalog for webserver.boxnet in environment production in 0.59 seconds
-Notice: /Stage[main]/Ntp::Install/Package[ntp]/ensure: created
-Notice: /Stage[main]/Ntp::Config/File[/etc/ntp.conf]/content: content changed '{md5}23775267ed60eb3b50806d7aeaa2a0f1' to '{md5}4b263233a4890fad5349d9e314e65f18'
-Notice: /Stage[main]/Ntp::Service/Service[ntp]/ensure: ensure changed 'stopped' to 'running'
-Notice: Finished catalog run in 7.17 seconds
-[root@webserver vagrant]# service ntpd status
-ntpd (pid  7518) is running...
-[root@webserver vagrant]#
-```
-
-When you're done, you can do a "shutdown -h now" from inside the box, exit the shell and run a "vagrant halt", or run a "vagrant destroy" if you're really done with it.
+Please let me know if you're interested in fedora/debian/ubuntu packages and I'll bump up my priority on adding that functionality. 
