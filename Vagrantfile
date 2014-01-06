@@ -13,8 +13,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       config.cache.auto_detect = true
     end
 
-
-  config.vm.define :centos_server do |node|
+  config.vm.define :centos6 do |node|
     node.vm.box = 'centos-64-x64-vbox4210-nocm'
     node.vm.box_url = 'http://puppet-vagrant-boxes.puppetlabs.com/centos-64-x64-vbox4210-nocm.box'
     node.vm.hostname = 'centos-rpmbuilder.boxnet'
@@ -23,6 +22,19 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
        vb.customize ["modifyvm", :id, "--memory", "512", "--cpus", "4", "--ioapic", "on"]
     end
 
+    node.vm.provision "shell", path: "tarsnap-build/tarsnap-rpm-builder.sh"
+  end
+
+  config.vm.define :centos5 do |node|
+    node.vm.box = 'centos-59-x64-vbox4210-nocm'
+    node.vm.box_url = 'http://puppet-vagrant-boxes.puppetlabs.com/centos-59-x64-vbox4210-nocm.box'
+    node.vm.hostname = 'centos-rpmbuilder.boxnet'
+
+    config.vm.provider :virtualbox do |vb|
+       vb.customize ["modifyvm", :id, "--memory", "512", "--cpus", "4", "--ioapic", "on"]
+    end
+
+    node.vm.provision "shell", path: "tarsnap-build/tarsnap-rpm-builder.sh"
   end
 
 end

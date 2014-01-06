@@ -31,7 +31,8 @@ node default {
     refreshonly => true,
     subscribe   => File['/etc/puppet/Puppetfile'],
     path        => '/usr/bin:/usr/sbin:/bin',
-    require     => File['/etc/puppet/Puppetfile'],
+    require     => [ File['/etc/puppet/Puppetfile'],
+                    Package['librarian-puppet'], ],
   }
 
 

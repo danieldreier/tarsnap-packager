@@ -3,5 +3,6 @@
 forge "http://forge.puppetlabs.com"
 
 mod "puppetlabs/ntp"
-mod "puppetlabs/stdlib"
 mod "example42/timezone"
+mod "example42/yum"
+mod "razorsedge/lsb"

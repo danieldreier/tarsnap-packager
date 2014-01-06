@@ -1,14 +1,7 @@
 # This is for a system where we'll be building CentOS 6 RPMs
 
 node basenode {
-  class { 'timezone':
-    timezone => 'US/Pacific',
-  }
-
   class { '::ntp':
-    # Using 4 sources for NTP to allow 3 sources during DNS failure on one of
-    # these providers 3 sources needed to sanity-check time by majority vote,
-    # in case of bad ntp server
     servers        => [ '0.north-america.pool.ntp.org',
                         '0.centos.pool.ntp.org',
                         'time.nist.gov',
@@ -20,19 +13,24 @@ node basenode {
 
   # Install the basic sysadmin tools we often need
   $sysadmin_tools = [ 'man', 'screen', 'nc', 'mtr', 'iotop', 'git' ]
-  package { $sysadmin_tools: ensure => 'installed' }
+  package { $sysadmin_tools:
+    ensure  => 'installed',
+    require => Yumrepo['epel'],
+  }
 
 }
 
 node default inherits basenode {
-  # Placeholder
-  #exec { 'yum Group Install':
-  #  unless  => '/usr/bin/yum grouplist "Development tools" | /bin/grep "^Installed Groups"',
-  #  command => '/usr/bin/yum -y groupinstall "Development tools"',
-  #}
+  class { 'yum':
+    extrarepo => [ 'epel' , 'puppetlabs' ],
+  }
+  class { 'lsb': }
 
-  $rpm_tools = [ 'rpm-build', 'redhat-rpm-config', 'redhat-lsb-core' ]
-  package { $rpm_tools: ensure => 'installed' }
+  $rpm_tools = [ 'rpm-build', 'redhat-rpm-config', 'ruby-devel.x86_64', 'rubygems', 'ruby' ]
+  package { $rpm_tools:
+    ensure  => 'installed',
+    require => Class['yum'],
+  }
   $compile_tools = [ 'make', 'gcc' ]
   package { $compile_tools: ensure => 'installed' }
 
@@ -43,7 +41,7 @@ node default inherits basenode {
   package { 'fpm':
     ensure   => 'installed',
     provider => 'gem',
-    require  => Package['rubygems'],
+    require  => [ Package['ruby-devel.x86_64'], Package['rubygems'], Package['ruby'] ],
   }
 
 }
